@@ -33,7 +33,7 @@ jobs:
         with:
           switches: -e 'ssh -p ${{ secrets.SSH_PORT }}' -avuzpg --delete
           path: ./PKGBUILD
-          remote_path: ${{ env.DIRECTORY }}/${{ env.$PROJECT_NAME }}/PKGBUILD
+          remote_path: ${{ env.DIRECTORY }}/${{ env.PROJECT_NAME }}/PKGBUILD
           remote_host: ${{ secrets.SSH_HOST }}
           remote_user: ${{ secrets.SSH_USER }}
           remote_key: ${{ secrets.SSH_KEY }}
