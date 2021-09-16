@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: SSH KEY
-        run: echo $SSH_KEY > ~/.ssh/id_rsa
+        run: mkdir ~/.ssh && echo $SSH_KEY > ~/.ssh/id_rsa
 
       - name: Packaging
         run: |
