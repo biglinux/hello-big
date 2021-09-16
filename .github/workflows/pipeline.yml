@@ -18,12 +18,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: SSH KEY
-        run: mkdir ~/.ssh && echo $SSH_KEY > ~/.ssh/id_rsa
-
-      - name: Packaging
+      - name: Define Project Name
         run: |
           PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d"/" -f2)
-          ssh -p $SSH_PORT $SSH_CONNECTION "cd $DIRECTORY && mkdir -p $PROJECT_NAME"
-          rsync -e 'ssh -p $SSH_PORT' -avuzpg --delete ./PKGBUILD $CONNECTION:$DIRECTORY/$PROJECT_NAME
-          ssh -p $SSH_PORT $SSH_CONNECTION "cd $DIRECTORY && buildpkg -p $PROJECT_NAME -r $DIRECTORY_PKGS -w"
+
+      - name: Create Directory Project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: cd $DIRECTORY && mkdir -p $PROJECT_NAME
+
+      - name: Send PKGBUILD
+        uses: burnett01/rsync-deployments@5.1
+        with:
+          switches: -e 'ssh -p ${{ secrets.SSH_PORT }}' -avuzpg --delete
+          path: ./PKGBUILD
+          remote_path: ${{ env.DIRECTORY }}/${{ env.$PROJECT_NAME }}/PKGBUILD
+          remote_host: ${{ secrets.SSH_HOST }}
+          remote_user: ${{ secrets.SSH_USER }}
+          remote_key: ${{ secrets.SSH_KEY }}
+
+      - name: Build Package
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: cd $DIRECTORY && buildpkg -p $PROJECT_NAME -r $DIRECTORY_PKGS -w
