@@ -26,7 +26,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: cd $DIRECTORY && mkdir -p $PROJECT_NAME
+          script: cd ${{ env.DIRECTORY }} && mkdir -p ${{ env.PROJECT_NAME }}
 
       - name: Send PKGBUILD
         uses: burnett01/rsync-deployments@5.1
@@ -45,4 +45,4 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          script: cd $DIRECTORY && buildpkg -p $PROJECT_NAME -r $DIRECTORY_PKGS -w
+          script: cd ${{ env.DIRECTORY }} && buildpkg -p ${{ env.PROJECT_NAME }} -r ${{ secret.DIRECTORY_PKGS }} -w
