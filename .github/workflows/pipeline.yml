@@ -6,17 +6,27 @@ on:
       - v*
 
 env:
-  EXAMPLE: xpto
+  REPOSITORY: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
+  DIRECTORY: /home/pkgbuild
 
 jobs:
 
-  docker_container:
+  packaging:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Dependencies
+        run: apt-get install -y openssh-client
+
+      - name: SSH KEY
+        run: echo $SSH_KEY > ~/.ssh/id_rsa
+
       - name: Packaging
         run: |
-          
+          PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d"/" -f2)
+          ssh -p $SSH_PORT $SSH_CONNECTION "cd $DIRECTORY && mkdir -p $PROJECT_NAME"
+          rsync -e 'ssh -p $SSH_PORT' -avuzpg --delete ./PKGBUILD $CONNECTION:$DIRECTORY/$PROJECT_NAME
+          ssh -p $SSH_PORT $SSH_CONNECTION "cd $DIRECTORY && buildpkg -p $PROJECT_NAME -r $DIRECTORY_PKGS -w"
