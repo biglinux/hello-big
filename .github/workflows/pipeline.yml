@@ -31,7 +31,7 @@ jobs:
       - name: Send PKGBUILD
         uses: burnett01/rsync-deployments@5.1
         with:
-          switches: -e '-avuzpg --delete'
+          switches: -avuzpg --delete
           path: ./pkgbuild
           remote_path: ${{ env.DIRECTORY }}/${{ env.PROJECT_NAME }}/pkgbuild
           remote_host: ${{ secrets.SSH_HOST }}
